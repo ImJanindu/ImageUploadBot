@@ -28,7 +28,6 @@ import shutil
 import logging
 from telegraph import upload_file
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 bot = Client(
     "Telegraph Bot",
@@ -41,23 +40,15 @@ START_TEXT = """
 Hi **{}** 👋
 
 Send me an Image and I'll send the direct link of that!
-"""
 
-START_BUTTONS = InlineKeyboardMarkup(
-    [
-        [
-            InlineKeyboardButton("📣 Channel", url="https://t.me/JaguarBots"),
-            InlineKeyboardButton("📚 Source Code", url="https://github.com/ImJanindu/ImageUploadBot")
-        ]
-    ]
-)
+Bot by @JaguarBots
+"""
 
 
 @bot.on_message(filters.command("start") & filters.private)
 async def start(_, message):
     msg = START_TEXT.format(message.from_user.mention)
-    await message.reply_text(text = msg,
-                             reply_markup = START_BUTTONS)
+    await message.reply_text(msg)
 
 
 @bot.on_message(filters.photo & filters.private)
@@ -67,7 +58,7 @@ async def getimage(_, message):
         os.makedirs(tmp)
     img_path = os.path.join(tmp, str(uuid.uuid4()) + ".jpg")
     m = await message.reply_text("📥 Downloading...", quote=True)
-    img_path = await client.download_media(message=message, file_name=img_path)
+    img_path = await bot.download_media(message=message, file_name=img_path)
     await m.edit("📤 Uploading...")
     try:
         response = upload_file(img_path)
